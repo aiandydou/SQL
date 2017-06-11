@@ -1,0 +1,99 @@
+#Nth Highest Salary
+
+Write a SQL query to get the nth highest salary from the Employee table.
+
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+For example, given the above Employee table, the nth highest salary where n = 2 is 200. If there is no nth highest salary, then the query should return null.
+
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+
+这个题目要写function来解决。
+在MYSQL中，function语法如下：
+
+CREATE FUNCTION function_name (ParameterName ParameterDataType)
+RETURNS return_data_type
+BEGIN function_body 
+RETURN scalar_expression
+END;
+
+解法一：
+CREATE FUNCTION getNthHighestSalaryt (N INT) RETURNS INT
+  BEGIN 
+    declare x INT;
+    SET N=N-1;
+    SET x=(SELECT distinct Salary FROM Employee ORDER BY Salary DESC LIMIT N,1);
+    if isnull(x) then 
+      return null;
+    else return x;
+    end if;
+ END;
+ 
+ 这个解法中有几点要注意：
+ 
+ 1.return值包含在if条件句中，因此没有专门的return value.
+ 
+ 2.mysql使用declare 变量名，变量类型 声明变量。
+ 
+ 3.mysql用set 变量名=值， 设置变量值。
+ 
+ 4.SELECT distinct Salary FROM Employee ORDER BY Salary DESC LIMIT N,1
+   按照降序取了Salary
+   
+ 5.LIMIT offset,count
+  offset:the first row to return
+  count: the maximum number of rows to return.
+  
+  平时经常讨论的，取前五行的用法为：
+  LIMIT 5 = LIMIT 0，5
+  
+  要取第N行：
+  LIMIT N,1 ：从第N行开始取，只去1行，所以取到了第N行。
+  
+  6.SET N=N-1 
+  把N-1值带入，取第二个最大的值。
+  
+  7.MYSQL中if语句：
+   if...then...;
+   elseif...then...;
+   else...;
+   end if;
+  
+  解法二：
+  CREATE FUNCTION getNthHighestSalary (N INT) RETURNS INT
+  BEGIN
+    declare M int;
+    set M=N-1;
+  RETURN
+    (SELECT DISTINCT Salary FROM Employee
+      order by Salary DESC LIMIT M,1);
+  END;
+  此解法基本与解法一相同，不同的在于用M代替N-1.
+  
+  解法三：
+  此解法适用于TOP的SQL中，如SQLserver.还未验证是否能运行。
+  CREATE FUNCTION  getNthHighestSalary (N INT) RETURNS INT
+  BEGIN
+    DECLARE N int;
+  RETURN
+    (SELECT TOP 1 FROM (SELECT TOP N Salary FROM Employee order by Employee DESC))
+  END;
+  
+  此解法中要注意以下内容：
+  1.SELECT TOP N Salary FROM Employee order by Employee DESC
+  取了最大的N个Salary
+  2.然而他们的排序还是default得asc的排序方法。
+  3.SELECT TOP 1 FROM (SELECT TOP N Salary FROM Employee order by Employee DESC)
+    因而，TOP 1 最后取得还是N个最大Salary（升序）中的第一个数：就是第N个最大的salary.
+  
+  
+ 
