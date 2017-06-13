@@ -1,0 +1,31 @@
+#182.Write a SQL query to find all duplicate emails in a table named Person.
+
++----+---------+
+| Id | Email   |
++----+---------+
+| 1  | a@b.com |
+| 2  | c@d.com |
+| 3  | a@b.com |
++----+---------+
+For example, your query should return the following for the above table:
+
++---------+
+| Email   |
++---------+
+| a@b.com |
++---------+
+Note: All emails are in lowercase.
+
+Solution:
+
+SELECT distinct Email FROM person
+    GROUP BY Email
+    Having count(Email)>=2;
+    
+    这个题目要注意Having 和where的区别。在where clause里面，是不可以用aggregate function的。
+    同时，where 的一般用法是：
+      WHERE...GROUP BY...:先filter rows，然后再分组。
+      而having 的用法是：
+      group by...having..，先分组，然后再filter groups，所以运算时间较长。
+      
+    相比而言，WHERE的用法更加简单。
