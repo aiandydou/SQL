@@ -1,0 +1,12 @@
+Query all columns for all American cities in CITY with populations larger than 100000. The CountryCode for America is USA.
+
+Input Format
+
+The CITY table is described as follows: 
+
+#Solution:
+
+SELECT * FROM city
+    WHERE population>100000 AND CountryCode='USA';
+    
+这个题目要注意是选择all columns.
