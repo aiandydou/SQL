@@ -25,3 +25,23 @@ Write a SQL query to find employees who have the highest salary in each of the d
 | Sales      | Henry    | 80000  |
 +------------+----------+--------+
 Subscribe to see which companies asked this question.
+
+
+Solution:
+SELECT D.name as Department, E.name as Employee, E.salary as Salary
+    FROM Employee E inner join department D ON e.departmentid=d.id
+    WHERE (departmentid,salary) in 
+    (SELECT departmentid, max(salary) FROM Employee group by departmentid);
+    
+  
+  在做这个题目有两个地方要注意：
+  第一次做错事了，做错的方式如下：
+  SELECT D.name as Department, E.name as Employee, E.salary as Salary
+    FROM Employee E inner join department D ON e.departmentid=d.id
+    WHERE salary in 
+    (SELECT  max(salary) FROM Employee group by departmentid);
+    在这里，我并没有把departmentid 拿出来用，所以就出现了重复。假如MAX(Salary)=8000和90000.那我取得是所有工资为8000，9000的人的信息，不仅仅是最高的人工资。
+    
+    2.WHERE (departmentid,salary) in 
+    要把它当作一个选取的条件来看，选取的条件是：对于满足不同的department的max(salary)的那些row。
+    所以就不要和前面的Employee E table 混为一谈。
