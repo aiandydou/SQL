@@ -1,0 +1,56 @@
+Pivot the Occupation column in OCCUPATIONS so that each Name is sorted alphabetically and displayed underneath its corresponding Occupation. The output column headers should be Doctor, Professor, Singer, and Actor, respectively.
+
+Note: Print NULL when there are no more names corresponding to an occupation.
+
+Input Format
+
+The OCCUPATIONS table is described as follows: Occupation will only contain one of the following values: Doctor, Professor, Singer or Actor.
+
+Sample Input
+Sample Output
+
+Jenny    Ashley     Meera  Jane
+Samantha Christeen  Priya  Julia
+NULL     Ketty      NULL   Maria
+Explanation
+
+The first column is an alphabetically ordered list of Doctor names. 
+The second column is an alphabetically ordered list of Professor names. 
+The third column is an alphabetically ordered list of Singer names. 
+The fourth column is an alphabetically ordered list of Actor names. 
+The empty cell data for columns with less than the maximum number of names per occupation (in this case, the Professor 
+and Actor columns) are filled with NULL values.
+
+#Solution
+解法一：
+
+SELECT Doctor,Professor,Singer,Actor FROM
+(SELECT *,row_number() over (partition by occupation order by name) AS rownumber
+    from occupations)AS TEMP 
+PIVOT (
+    MAX(NAME)
+    FOR occupation
+    IN ([Doctor],[Professor],[Singer],[Actor])) as pivottable
+    
+为了理解这个题目，首先要理解两个内容：row_number()over()的问题以及PIVOT table的问题。
+如果运行以下code，会得到一个新的一列，这个列会根据occupation的不同而排序。
+
+SELECT *,row_number() over (partition by occupation order by name)
+from occupations 
+同时要注意，order by name 和order by occupation会有不同的结果。因为题目要求根据name的顺序来排序，所以就用order by name。
+
+另一个要注意的内容是 pivot() function.这个function根据occupation 里面有四个职业而可以产生四个不同的column：doctor,professor,singer,actor.
+具体用法如下：
+  SELECT pivotcol1,pivotcol2,pivotco3,pivot4 FROM table
+    pivot( max(value_we_want_to_have)
+        FRO column
+        IN ([pivotcol1],[pivotcol2],[pivotcol3],[pivotcol4]))
+        
+这里要注意的一个问题是， 如果我们不用row_number对每个职业进行重新的排序的话，那max(name)只会取在同一类职业中排名最后的一个人。
+例如：doctor中排名最后的是Priya,professor中排名最后的是Priyanka，singer中排名最后的是Kristeen，actor中排名最后的是Samantha。
+所以我们就只能得到一排：Priya Priyanka Kristeen Samantha，这并不是我们想要的结果。
+
+但是如果我们用了row_number这个function的话，那么对每个人都有一个新的id来定义，那么它就是独立的一row,在用max(name)的时候，取得也只是它本身。
+而这个时候，不管是max(name)还是min(name),结果都是一样的。
+
+这也就是需要row_number这个function的意义。
