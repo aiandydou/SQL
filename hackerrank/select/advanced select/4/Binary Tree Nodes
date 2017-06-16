@@ -1,0 +1,36 @@
+You are given a table, BST, containing two columns: N and P, where N represents the value of a node in Binary Tree, and P is the parent of N.
+
+
+
+Write a query to find the node type of Binary Tree ordered by the value of the node. Output one of the following for each node:
+
+Root: If node is root node.
+Leaf: If node is leaf node.
+Inner: If node is neither root nor leaf node.
+Sample Input
+
+
+
+Sample Output
+
+1 Leaf
+2 Inner
+3 Leaf
+5 Root
+6 Leaf
+8 Inner
+9 Leaf
+
+#Solution
+SELECT 
+   N,CASE WHEN P is null THEN 'Root'
+        WHEN N IN (SELECT P FROM BST) THEN 'Inner'
+        ELSE 'Leaf'
+    END
+FROM BST
+ORDER BY N
+
+这个题目之前在写的时候，这个语句写错了，WHEN N IN (SELECT P FROM BST) THEN 'Inner'，
+写成了WHEN P IN (SELECT N FROM BST) THEN 'Inner',p的值少，n的值多，p包含于n.所以这样写的结果就是：除了那个null,之外，都是对的，所以最后的结果除了
+一个root之外，其他的都是inner。
+所以在写in 语句的时候，要注意包含于被包含的关系。
