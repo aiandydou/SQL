@@ -1,0 +1,73 @@
+Julia asked her students to create some coding challenges. Write a query to print the hacker_id, name, and the total number of 
+challenges created by each student. Sort your results by the total number of challenges in descending order. If more than one student
+created the same number of challenges, then sort the result by hacker_id. If more than one student created the same number of challenges
+and the count is less than the maximum number of challenges created, then exclude those students from the result.
+
+Input Format
+
+The following tables contain challenge data:
+
+Hackers: The hacker_id is the id of the hacker, and name is the name of the hacker. 
+
+Challenges: The challenge_id is the id of the challenge, and hacker_id is the id of the student who created the challenge. 
+
+Sample Input 0
+
+Hackers Table: Challenges Table: 
+
+Sample Output 0
+
+21283 Angela 6
+88255 Patrick 5
+96196 Lisa 1
+Sample Input 1
+
+Hackers Table: Challenges Table: 
+
+Sample Output 1
+
+12299 Rose 6
+34856 Angela 6
+79345 Frank 4
+80491 Patrick 3
+81041 Lisa 1
+Explanation
+
+For Sample Case 0, we can get the following details: 
+
+Students  and  both created  challenges, but the maximum number of challenges created is  so these students are excluded from
+the result.
+
+For Sample Case 1, we can get the following details: 
+
+Students  and  both created  challenges. Because  is the maximum number of challenges created, these students are included in the 
+result.
+
+#Solution:
+select h.hacker_id,h.name,count(c.challenge_id)
+    from Hackers h inner join challenges c
+    on h.hacker_id=c.hacker_id
+group by h.hacker_id,h.name
+having count(c.challenge_id)=(select max(num) from (
+    select count(challenge_id) as num from Challenges
+    group by hacker_id) as temp)
+    or count(c.challenge_id) not in 
+(select countnum from 
+(select count(challenge_id) as countnum from challenges
+group by hacker_id) as countnum
+group by countnum
+having count(countnum)>1)
+order by count(c.challenge_id) desc,h.hacker_id
+
+解析：
+1.整体思路是： count(c.challege_id) 要不然等于 max(count(c.challenge_id)),不然就not in count(challenge)重复两遍的list里。
+但是count(c.challenge_id) 不能再叠加使用max或者count等function,所以要做的就是要建derived table.
+
+2.derived table 与subquery的区别。
+subquery 是一个select statement,一般出现在where 句中.
+derived table 也是select statement,但出现在select..from......中。同时要注意derived table一定要加一个alias。在derived table中的新的column可以
+取新的column name,而且适用于原来table 的select...from...中。
+
+3.几个还需要注意的小细节是：
+having count()不是 where  count()
+group by 要出现在having 之前。
