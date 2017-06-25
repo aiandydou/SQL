@@ -1,0 +1,45 @@
+You are given a table, Functions, containing two columns: X and Y.
+
+Two pairs (X1, Y1) and (X2, Y2) are said to be symmetric pairs if X1 = Y2 and X2 = Y1.
+
+Write a query to output all such symmetric pairs in ascending order by the value of X.
+Sample Input
+Sample Output
+
+20 20
+20 21
+22 23
+
+#Solution:
+select x,y from 
+( select f1.x,f1.y from functions f1
+  where exists(select 1 from functions f2
+  where f1.x=f2.y and f2.x=f1.y and f1.x<f1.y)
+  
+  union
+  select x,y from functions
+  where x=y
+  group by x,y
+  having count(*)>1
+) As Temp
+order by x
+解析：
+题目中有个几个问题：exists 的用法，union的用法，derived table的用法。
+1.derived table的用法没什么好说的了，出现在select...from...中，然后需要一个alias。
+2.union是用于结合两个select statements。
+要出现题中要求的结果可以有两种情况：
+20 20
+20 20
+或者20 21
+    21 20.
+前一种情况的出现就是x=y,然后这样的row出现两次。
+
+20 21
+21 20
+这种情况的需要就需要两个table f1, f2进行相应的比较。
+
+3.exists 的用法
+exists 用于where clause 里面，如果exists的结果是true,是真的话，那么就会执行outer query（select f1.x,f1.y）
+这里的用法中值得注意的是exists里面select 1或者select * 都会出现相同的结果，不影响结果。
+同时exists 里面的句子其实是和外面的相结合的。f1,f2 table进行了比对。
+
