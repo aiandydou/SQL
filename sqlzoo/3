@@ -1,0 +1,13 @@
+Find the largest country (by area) in each continent, show the continent, the name and the area:
+
+
+SELECT continent,name,area 
+FROM world
+WHERE area in (SELECT max(area) FROM world GROUP BY continent)
+这个写法虽然通过了答案，但是肯定是不对的。因为如果max(area)有相同的，那就不是一一对应的关系了。
+
+SELECT w1.continent,w1.name,w1.area
+FROM world w1
+WHERE w1.area=(SELECT max(w2.area) FROM world w2  WHERE w1.continent=w2.continent)
+这个写法是对的，但是不是很理解为什么。
+尤其不能理解的是为什么不用group by
