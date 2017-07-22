@@ -1,0 +1,6 @@
+Some countries have populations more than three times that of any of their neighbours (in the same continent). 
+Give the countries and continents.
+
+SELECT w1.name,w1.continent 
+FROM world w1
+WHERE w1.population>ALL(SELECT 3*population FROM world w2  WHERE w1.continent=w2.continent AND w1.name<>w2.name)
